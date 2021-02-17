@@ -44,4 +44,4 @@ jobs:
          - name: skim
            run: |
                chmod u+x ./skim
-               ./skim
+               ./skim root://eospublic.cern.ch//eos/root-eos/HiggsTauTauReduced/GluGluToHToTauTau.root skim_ggH.root 19.6 11467.0 0.1
