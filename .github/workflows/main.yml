@@ -1,17 +1,11 @@
 name: example
 on: push
 jobs:
-  greeting:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo hello world
-
   build_skim:
-    needs: greeting
     runs-on: ubuntu-latest
     strategy:
         matrix:
-            version: [6.18.04, latest]
+            version: [6.18.04]
 
     container: rootproject/root-conda:${{ matrix.version }}
     steps:
@@ -45,3 +39,30 @@ jobs:
            run: |
                chmod u+x ./skim
                ./skim root://eospublic.cern.ch//eos/root-eos/HiggsTauTauReduced/GluGluToHToTauTau.root skim_ggH.root 19.6 11467.0 0.1
+         
+         - uses: actions/upload-artifact@v2
+           with:
+              name: skim_ggH
+              path: skim_ggH.root
+
+   plot:
+       needs: skim
+       runs-on: ubuntu-latest
+       container: rootproject/root-conda:6.18.04
+       steps:
+           - name: Checkout repository
+             uses: actions/checkout@v2
+
+           - name: Fetch data
+             uses: actions/download-artifact@v2
+             with:
+                name: skim_ggH
+
+           - name: plot
+             run: python histograms.py skim_ggH.root ggH hist_ggH.root
+
+           - uses: actions/upload-artifact@v2
+             with:
+                name: hist_ggH 
+                path: hist_ggH.root
+
